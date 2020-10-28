@@ -32,7 +32,6 @@ public class GoL {
                 .filter(p -> p.get().getX() == x)
                 .filter(p -> p.get().getY() == y)
                 .forEach(p -> p.get().setState(true));
-        //this.board[x][y] = 1;
     }
 
     public void setDead(int x, int y) {
@@ -41,27 +40,7 @@ public class GoL {
                 .filter(p -> p.get().getX() == x)
                 .filter(p -> p.get().getY() == y)
                 .forEach(p -> p.get().setState(false));
-        // this.board[x][y] = 0;
     }
-
-   /* public byte printBoard() {
-        System.out.println(" ");
-        OptionalInt opX = boardList.stream().mapToInt(p -> p.get().getX()).max();
-        for (int i = 0; i < opX.getAsInt(); i++) {
-            String line = "";
-            System.out.print(line);
-            int finalI = i;
-
-            boardList.stream()
-                    .filter(Optional::isPresent)
-                    .filter(point -> point.get().getY() == finalI)
-                    .forEach(point -> System.out.print(accept(point.get())));
-
-            System.out.println(line);
-        }
-
-        return 0;
-    }*/
 
     public String printBoard() {
         StringBuilder line = new StringBuilder();
@@ -163,28 +142,4 @@ public class GoL {
 
         this.boardList = newboardList;
     }
-
-    public void showNeighbors() {
-        long neighbors = countAliveNeighbours(new Point(5, 6, true), boardList);
-        System.out.println(neighbors);
-    }
-    public static void main(String[] args) {
-        GoL gameOfLife = new GoL(10,10);
-        gameOfLife.setAlive(4,5);
-        gameOfLife.setAlive(5,5);
-        gameOfLife.setAlive(6,5);
-
-        gameOfLife.printBoard();
-        gameOfLife.step();
-
-        gameOfLife.printBoard();
-        gameOfLife.step();
-
-        gameOfLife.printBoard();
-        gameOfLife.step();
-
-
-
-    }
-
 }
