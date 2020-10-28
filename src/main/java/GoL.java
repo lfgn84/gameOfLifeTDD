@@ -50,9 +50,7 @@ public class GoL {
             line.append(boardList.stream()
                     .filter(point ->
                             point.get().getX() == finalI)
-                    .map(point -> {
-                        return accept(point.get());
-                    }).collect(Collectors.joining())).append("\n");
+                    .map(point -> accept(point.get())).collect(Collectors.joining())).append("\n");
         }
         return line.toString();
     }
