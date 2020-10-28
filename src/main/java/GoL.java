@@ -133,7 +133,6 @@ public class GoL {
                             .filter(p -> p.get().isState())
                             .count() == 1
                     ) {
-
                         point.setState(aliveNeighbours == 2 || aliveNeighbours == 3);
                     } else {
                         point.setState(aliveNeighbours == 3);
