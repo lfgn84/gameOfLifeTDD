@@ -24,7 +24,7 @@ class GoLTest {
     }
 
     @Test
-    void shouldReturnAnIntOFHowManyActiveCellsWhenTestingSevralPoints() {
+    void shouldReturnAnIntOFHowManyActiveCellsWhenTestingSeveralPoints() {
         gameOfLife = new GoL(3, 3);
         gameOfLife.setAlive(0, 1);
         gameOfLife.setAlive(1, 1);

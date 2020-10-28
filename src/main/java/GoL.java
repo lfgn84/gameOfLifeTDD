@@ -56,7 +56,6 @@ public class GoL {
         }
         return line.toString();
     }
-
     public long countAliveNeighbours(Point point, List<Optional<Point>> templist) {
         int x = point.getX();
         int y = point.getY();
@@ -125,6 +124,7 @@ public class GoL {
         newboardList.stream()
                 .map(Optional::get)
                 .forEach(point -> {
+                    int aliveNeighbours = (int) countAliveNeighbours(point, boardList);
                     if (boardList.stream()
                             .filter(Optional::isPresent)
                             .filter(p -> p.get().getX() == point.getX())
@@ -132,10 +132,9 @@ public class GoL {
                             .filter(p -> p.get().isState())
                             .count() == 1
                     ) {
-                        int aliveNeighbours = (int) countAliveNeighbours(point, boardList);
-                        point.setState(aliveNeighbours == 2);
+
+                        point.setState(aliveNeighbours == 2 || aliveNeighbours == 3);
                     } else {
-                        int aliveNeighbours = (int) countAliveNeighbours(point, boardList);
                         point.setState(aliveNeighbours == 3);
                     }
                 });
