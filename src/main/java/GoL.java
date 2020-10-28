@@ -62,17 +62,17 @@ public class GoL {
         long count;
 
 
-        long above1 = templist.stream()
+        long under1 = templist.stream()
                 .filter(Optional::isPresent)
                 .filter(point1 -> point1.get().getX() == x - 1 && point1.get().getY() == y - 1)
                 .filter(point1 -> point1.get().isState())
                 .count();
-        long above2 = templist.stream()
+        long under2 = templist.stream()
                 .filter(Optional::isPresent)
                 .filter(point1 -> point1.get().getX() == x && point1.get().getY() == y - 1)
                 .filter(point1 -> point1.get().isState())
                 .count();
-        long above3 = templist.stream()
+        long under3 = templist.stream()
                 .filter(Optional::isPresent)
                 .filter(point1 -> point1.get().getX() == x + 1 && point1.get().getY() == y - 1)
                 .filter(point1 -> point1.get().isState())
@@ -89,17 +89,17 @@ public class GoL {
                 .filter(point1 -> point1.get().isState())
                 .count();
 
-        long under1 = templist.stream()
+        long above1 = templist.stream()
                 .filter(Optional::isPresent)
                 .filter(point1 -> point1.get().getX() == x - 1 && point1.get().getY() == y + 1)
                 .filter(point1 -> point1.get().isState())
                 .count();
-        long under2 = templist.stream()
+        long above2 = templist.stream()
                 .filter(Optional::isPresent)
                 .filter(point1 -> point1.get().getX() == x && point1.get().getY() == y + 1)
                 .filter(point1 -> point1.get().isState())
                 .count();
-        long under3 = templist.stream()
+        long above3 = templist.stream()
                 .filter(Optional::isPresent)
                 .filter(point1 -> point1.get().getX() == x + 1 && point1.get().getY() == y + 1)
                 .filter(point1 -> point1.get().isState())
