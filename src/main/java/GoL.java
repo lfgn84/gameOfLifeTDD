@@ -2,141 +2,107 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.stream.Collectors;
-
 
 public class GoL {
     private List<Optional<Point>> boardList = new ArrayList<>();
+    private final OptionalInt maxX;
+    private final OptionalInt maxY;
 
     public GoL(int width, int height) {
-        for (int i = 0; i <= width; i++) {
-            for (int j = 0; j <= height; j++) {
-                boardList.add(Optional.of(new Point(i, j, false)));
-            }
-        }
+        this.maxX = OptionalInt.of(width);
+        this.maxY = OptionalInt.of(height);
     }
 
     public List<Optional<Point>> getBoardList() {
         return boardList;
     }
 
-    private String accept(Point point) {
-        if (!point.isState())
-            return ".";
-        return "*";
-    }
-
-    public void setAlive(int x, int y) {
-        boardList.stream()
-                .filter(Optional::isPresent)
-                .filter(p -> p.get().getX() == x)
-                .filter(p -> p.get().getY() == y)
-                .forEach(p -> p.get().setState(true));
-    }
-
-    public void setDead(int x, int y) {
-        boardList.stream()
-                .filter(Optional::isPresent)
-                .filter(p -> p.get().getX() == x)
-                .filter(p -> p.get().getY() == y)
-                .forEach(p -> p.get().setState(false));
-    }
-
     public String printBoard() {
         StringBuilder line = new StringBuilder();
-        OptionalInt opX = boardList.stream().mapToInt(p -> p.get().getX()).max();
-        for (int i = 0; i < opX.getAsInt() + 1; i++) {
-            int finalI = i;
-            line.append(boardList.stream()
-                    .filter(point ->
-                            point.get().getX() == finalI)
-                    .map(point -> accept(point.get())).collect(Collectors.joining())).append("\n");
+
+        for (int i = 0; i < maxX.getAsInt(); i++) {
+            for (int j = 0; j < maxY.getAsInt(); j++) {
+                if (checkIfPointExistsInList(i, j))
+                    line.append(PointState.ALIVE);
+                else
+                    line.append(PointState.DEAD);
+            }
+            line.append("\n");
         }
         return line.toString();
     }
+
+    public void setAlive(int x, int y) {
+        if (x > maxX.getAsInt() || y > maxY.getAsInt() || x < 0 || y < 0)
+            throw new IllegalArgumentException();
+        if (!checkIfPointExistsInList(x, y))
+            boardList.add(Optional.of(new Point(x, y)));
+    }
+
+    public boolean checkIfPointExistsInList(int x, int y) {
+        return boardList.stream()
+                .map(Optional::get)
+                .filter(point -> point.getX() == x)
+                .filter(point -> point.getY() == y)
+                .count() == 1;
+    }
+
+    public void setDead(int x, int y) {
+        boardList.remove(boardList.stream()
+                .filter(point -> point.get().getX() == x)
+                .filter(point -> point.get().getY() == y)
+                .map(Optional::get)
+                .findFirst());
+    }
+
     public long countAliveNeighbours(Point point, List<Optional<Point>> templist) {
         int x = point.getX();
         int y = point.getY();
-        long count;
+        long count = 0;
+        Point aboveLeft = new Point(x - 1, y - 1);
+        Point aboveMiddle = new Point(x - 1, y);
+        Point aboveRight = new Point(x - 1, y + 1);
+        Point aSideLeft = new Point(x, y - 1);
+        Point aSideRight = new Point(x, y + 1);
+        Point underLeft = new Point(x + 1, y - 1);
+        Point underMiddle = new Point(x + 1, y);
+        Point underRight = new Point(x + 1, y + 1);
 
+        Point[] positionArray = {aboveLeft, aboveMiddle, aboveRight, aSideLeft, aSideRight, underLeft, underMiddle, underRight};
 
-
-        long under1 = templist.stream()
-                .filter(Optional::isPresent)
-                .filter(p -> p.get().getX() == x - 1 && p.get().getY() == y - 1)
-                .filter(p -> p.get().isState())
-                .count();
-        long under2 = templist.stream()
-                .filter(Optional::isPresent)
-                .filter(p -> p.get().getX() == x && p.get().getY() == y - 1)
-                .filter(p -> p.get().isState())
-                .count();
-        long under3 = templist.stream()
-                .filter(Optional::isPresent)
-                .filter(p -> p.get().getX() == x + 1 && p.get().getY() == y - 1)
-                .filter(p -> p.get().isState())
-                .count();
-
-        long aSide1 = templist.stream()
-                .filter(Optional::isPresent)
-                .filter(p -> p.get().getX() == x - 1 && p.get().getY() == y)
-                .filter(p -> p.get().isState())
-                .count();
-        long aSide2 = templist.stream()
-                .filter(Optional::isPresent)
-                .filter(p -> p.get().getX() == x + 1 && p.get().getY() == y)
-                .filter(p -> p.get().isState())
-                .count();
-
-        long above1 = templist.stream()
-                .filter(Optional::isPresent)
-                .filter(p -> p.get().getX() == x - 1 && p.get().getY() == y + 1)
-                .filter(p -> p.get().isState())
-                .count();
-        long above2 = templist.stream()
-                .filter(Optional::isPresent)
-                .filter(p -> p.get().getX() == x && p.get().getY() == y + 1)
-                .filter(p -> p.get().isState())
-                .count();
-        long above3 = templist.stream()
-                .filter(Optional::isPresent)
-                .filter(p -> p.get().getX() == x + 1 && p.get().getY() == y + 1)
-                .filter(p -> p.get().isState())
-                .count();
-
-        count = above1 + above2 + above3 + aSide1 + aSide2 + under1 + under2 + under3;
-
+        for (Point value : positionArray) {
+            count += neighbourCheck(templist, value);
+        }
 
         return count;
     }
 
+    private long neighbourCheck(List<Optional<Point>> templist, Point tempPoint) {
+        return templist.stream()
+                .map(Optional::get)
+                .filter(point -> point.getX() == tempPoint.getX()
+                        && point.getY() == tempPoint.getY())
+                .count();
+    }
+
     public void step() {
         List<Optional<Point>> newboardList = new ArrayList<>();
-
-        OptionalInt opX = boardList.stream().mapToInt(p -> p.get().getX()).max();
-        OptionalInt opY = boardList.stream().mapToInt(p -> p.get().getY()).max();
-        for (int i = 0; i < opX.getAsInt() + 1; i++) {
-            for (int j = 0; j < opY.getAsInt() + 1; j++) {
-                newboardList.add(Optional.of(new Point(i, j, false)));
-            }
+        for (int i = 0; i < maxX.getAsInt(); i++) {
+            CheckPointsInEachColumnInGrid(newboardList, i);
         }
-        newboardList.stream()
-                .map(Optional::get)
-                .forEach(point -> {
-                    int aliveNeighbours = (int) countAliveNeighbours(point, boardList);
-                    if (boardList.stream()
-                            .filter(Optional::isPresent)
-                            .filter(p -> p.get().getX() == point.getX())
-                            .filter(p -> p.get().getY() == point.getY())
-                            .filter(p -> p.get().isState())
-                            .count() == 1
-                    ) {
-                        point.setState(aliveNeighbours == 2 || aliveNeighbours == 3);
-                    } else {
-                        point.setState(aliveNeighbours == 3);
-                    }
-                });
-
         this.boardList = newboardList;
+    }
+
+    private void CheckPointsInEachColumnInGrid(List<Optional<Point>> newboardList, int i) {
+        for (int j = 0; j < maxY.getAsInt(); j++) {
+            Point point = new Point(i, j);
+            int aliveNeighboursOnPoint = (int) countAliveNeighbours(point, boardList);
+
+            if (checkIfPointExistsInList(point.getX(), point.getY())
+                    && (aliveNeighboursOnPoint == 2 || aliveNeighboursOnPoint == 3))
+                newboardList.add(Optional.of(point));
+            else if (aliveNeighboursOnPoint == 3)
+                newboardList.add(Optional.of(point));
+        }
     }
 }
